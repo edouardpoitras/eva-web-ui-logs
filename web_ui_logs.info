@@ -1,0 +1,4 @@
+name = Web UI Logs
+description = Adds a way of viewing logs from the Web UI.
+version = 0.1.0
+dependencies = web_ui, mongodb_logging

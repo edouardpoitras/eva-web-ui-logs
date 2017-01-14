@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% include "alerts.html" %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Logs</h1>
+            <table id="logs" class="table table-striped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <td>Time</td>
+                        <td>Type</td>
+                        <td>Message</td>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <span id="bottom"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        // Pull more logs periodically with JS.
+        var timestamp = 0;
+        // Keep track of where user is on page for enable/disable tail effect.
+        var isBottom = true;
+        // Tail log effect.
+        function jumpToBottom() {
+            // Reset hash.
+            location.hash = "";
+            // Jump to bottom.
+            location.hash = "#bottom";
+        }
+        // Update the isBottom variable as needed.
+        $(window).scroll(function() {
+            if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                isBottom = true;
+            } else {
+                isBottom = false;
+            }
+        });
+        // The log updater.
+        function updater() {
+            $.ajax({
+                url: '/logs/more/' + timestamp,
+                success: function(data) {
+                    var json = JSON.parse(data);
+                    for (i = 0; i < json.length; i++) {
+                        timestamp = json[i]['timestamp']['$date'];
+                        var date = new Date(timestamp);
+                        var type = json[i]['type']
+                        var row_class = type;
+                        if (row_class == 'error') row_class = 'danger';
+                        var message = json[i]['message']
+                        type = type.toUpperCase();
+                        $('#logs tbody').append('<tr class="' + row_class + '"><td>' + date + '<\/td><td>' + type + '<\/td><td>' + message + '<\/td><\/tr>');
+                    }
+                    // Only jump user to bottom if already tailing at the bottom.
+                    if (isBottom) jumpToBottom();
+                },
+                complete: function() {
+                    setTimeout(updater, 1000);
+                }
+            });
+        }
+        // Start the log updater.
+        updater();
+    </script>
+{% endblock %}
