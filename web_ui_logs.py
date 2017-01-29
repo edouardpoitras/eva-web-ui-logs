@@ -14,13 +14,14 @@ def web_ui_start(app):
     app.add_url_rule('/logs', 'logs', logs)
     app.add_url_rule('/logs/more/<timestamp>', 'more_logs', more_logs)
 
-@gossip.register('eva.web_ui.menu_items', provides=['web_ui_logs'])
-def web_ui_menu_items():
+@gossip.register('eva.web_ui.menu_items', needs=['web_ui'], provides=['web_ui_logs'])
+def web_ui_menu_items(menu_items):
     menu_item = {'path': '/logs', 'title': 'Logs'}
-    conf['plugins']['web_ui']['config']['menu_items'].append(menu_item)
+    menu_items.append(menu_item)
 
 def logs():
-    menu_items = conf['plugins']['web_ui']['module'].ready_menu_items()
+    menu_items = []
+    gossip.trigger('eva.web_ui.menu_items', menu_items=menu_items)
     return render_template_string(logs_markup, menu_items=menu_items)
 
 def more_logs(timestamp):
