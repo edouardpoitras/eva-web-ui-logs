@@ -3,6 +3,8 @@ Web UI Logs
 
 An Eva plugin that adds a way of viewing logs from the Web UI.
 
+![Web UI Logs](/screenshot.png?raw=true "https://127.0.0.1:8080/logs")
+
 You will only see log messages from AFTER the [MongoDB Logging](https://github.com/edouardpoitras/eva-mongodb-logging) plugin has been enabled during the boot process.
 
 The logs may not reveal issues with parsing the plugins directories or the config files, and may not catch any plugin errors that occur before the [MongoDB Logging](https://github.com/edouardpoitras/eva-mongodb-logging) plugin's instantiation.
